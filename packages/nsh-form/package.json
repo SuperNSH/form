@@ -10,7 +10,7 @@
     ".": "./src/index.ts"
   },
   "files": ["src"],
-  "repository": "https://github.com/SuperNSH/nsh-form",
+  "repository": "https://github.com/SuperNSH/form",
   "dependencies": {
     "@tanstack/form-core": "1.33.5"
   }
