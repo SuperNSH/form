@@ -7,10 +7,18 @@ license.workspace = true
 repository.workspace = true
 authors.workspace = true
 
+[features]
+phone = ["dep:phonenumber", "freeoxide-gpui-form-core/phone"]
+persist = ["dep:serde", "dep:serde_json"]
+
 [dependencies]
 freeoxide-gpui-form-core = "0.11"
 nsh-base = "0.4.0"
 nsh-core = "0.4.0"
+regex = "1.13.1"
+phonenumber = { version = "0.3", optional = true }
+serde = { version = "1", features = ["derive"], optional = true }
+serde_json = { version = "1", optional = true }
 
 [dev-dependencies]
 nsh-engine = "0.4.0"
