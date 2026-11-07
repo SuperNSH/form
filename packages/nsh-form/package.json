@@ -10,7 +10,7 @@
     ".": "./src/index.ts"
   },
   "files": ["src"],
-  "repository": "https://github.com/freeoxide/nsh-form",
+  "repository": "https://github.com/SuperNSH/nsh-form",
   "dependencies": {
     "@tanstack/form-core": "1.33.5"
   }
