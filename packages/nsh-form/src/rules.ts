@@ -1,55 +1,66 @@
-/** A rule returns the message when the value fails. It sees the whole form, so "must match" works. */
-export type Rule<T, V = unknown> = (value: T, values: V) => string | null | undefined;
+/** A field validator: returns the message when the value fails, or `undefined` when it passes. */
+export type Rule<T = unknown> = (props: { value: T }) => string | undefined;
 
-function isBlank(value: unknown): boolean {
-  if (value === null || value === undefined) return true;
-  if (typeof value === "string") return value.trim().length === 0;
-  if (Array.isArray(value)) return value.length === 0;
-  return false;
+/** Fails when the value is empty: `""`, whitespace only, `null`, or `undefined`. */
+export function required(message: string): Rule<unknown> {
+  return ({ value }) => (value === null || value === undefined || String(value).trim() === "" ? message : undefined);
 }
 
-export function required<T, V = unknown>(message: string): Rule<T, V> {
-  return (value) => (isBlank(value) ? message : null);
+/** One `@` with text on each side, and a dot in the domain. An empty value passes; pair it with `required`. */
+export function email(message: string): Rule<string> {
+  return ({ value }) => (value === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? undefined : message);
 }
 
-/** Counts characters, not UTF-16 units. An empty value passes, so pair it with `required`. */
-export function minLength<V = unknown>(min: number, message: string): Rule<string, V> {
-  return (value) => (value.length > 0 && [...value].length < min ? message : null);
-}
-
-export function maxLength<V = unknown>(max: number, message: string): Rule<string, V> {
-  return (value) => ([...value].length > max ? message : null);
-}
-
-/** One `@` with something on both sides and a dot after it. An empty value passes. */
-export function email<V = unknown>(message: string): Rule<string, V> {
-  return (value) => {
-    if (value.length === 0) return null;
-    const parts = value.split("@");
-    const valid =
-      parts.length === 2 &&
-      parts[0].length > 0 &&
-      parts[1].split(".").length >= 2 &&
-      parts[1].split(".").every((part) => part.length > 0);
-    return valid ? null : message;
+/** An absolute `http` or `https` URL. An empty value passes; pair it with `required`. */
+export function url(message: string): Rule<string> {
+  return ({ value }) => {
+    if (value === "") return undefined;
+    try {
+      const parsed = new URL(value);
+      return parsed.protocol === "http:" || parsed.protocol === "https:" ? undefined : message;
+    } catch {
+      return message;
+    }
   };
 }
 
-export function pattern<V = unknown>(regex: RegExp, message: string): Rule<string, V> {
-  return (value) => (value.length === 0 || regex.test(value) ? null : message);
+/** Lowercase words of letters and digits joined by single hyphens. An empty value passes. */
+export function slug(message: string): Rule<string> {
+  return ({ value }) => (value === "" || /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value) ? undefined : message);
 }
 
-export function range<V = unknown>(min: number, max: number, message: string): Rule<number, V> {
-  return (value) => (value < min || value > max ? message : null);
+/** A UUID in the 8-4-4-4-12 hexadecimal form, any version. An empty value passes. */
+export function uuid(message: string): Rule<string> {
+  return ({ value }) =>
+    value === "" || /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value) ? undefined : message;
 }
 
-/** The value must equal another value of the form, such as a password's confirmation. */
-export function matches<T, V>(other: (values: V) => T, message: string): Rule<T, V> {
-  return (value, values) => (Object.is(value, other(values)) ? null : message);
+/** At least `min` characters, counted as code points. An empty value passes; pair it with `required`. */
+export function minLength(min: number, message: string): Rule<string> {
+  return ({ value }) => (value === "" || [...value].length >= min ? undefined : message);
 }
 
-/** Text that is a number. An empty value passes. Rejects leading zeros, as gpui-form does. */
-export function numeric<V = unknown>(message: string, options: { signed?: boolean } = {}): Rule<string, V> {
-  const shape = options.signed ? /^-?(0|[1-9]\d*)(\.\d+)?$/ : /^(0|[1-9]\d*)(\.\d+)?$/;
-  return (value) => (value.length === 0 || shape.test(value) ? null : message);
+/** At most `max` characters, counted as code points. */
+export function maxLength(max: number, message: string): Rule<string> {
+  return ({ value }) => ([...value].length <= max ? undefined : message);
+}
+
+/** A number at least `min`. Text that is not a number fails. */
+export function min(bound: number, message: string): Rule<number | string | null> {
+  return ({ value }) => (value !== null && value !== "" && Number(value) >= bound ? undefined : message);
+}
+
+/** A number at most `bound`. Text that is not a number fails. */
+export function max(bound: number, message: string): Rule<number | string | null> {
+  return ({ value }) => (value !== null && value !== "" && Number(value) <= bound ? undefined : message);
+}
+
+/** The whole value matches `regex`. An empty value passes; pair it with `required`. */
+export function pattern(regex: RegExp, message: string): Rule<string> {
+  return ({ value }) => (value === "" || new RegExp(regex.source, regex.flags.replace(/[gy]/g, "")).test(value) ? undefined : message);
+}
+
+/** The value is one of `choices`. */
+export function oneOf<T>(choices: readonly T[], message: string): Rule<T> {
+  return ({ value }) => (choices.includes(value) ? undefined : message);
 }
