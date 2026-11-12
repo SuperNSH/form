@@ -1163,14 +1163,19 @@ function RulesScreen() {
   const blurredAt = signal(0);
   const checkedAt = signal(0);
   const slugRuns = signal(0);
+  const formBlurredAt = signal(0);
+  const formCheckedAt = signal(0);
   const form = createForm(() => ({
     defaultValues: { code: "", note: "", slug: "", password: "", confirm: "" },
+    listeners: { onBlur: () => formBlurredAt.set(Date.now()) },
     validators: {
       onMount: ({ value }) => (value.code === "" ? { fields: { code: "Form mount: code needed" } } : undefined),
       onBlur: ({ value }) => (value.note === "bad" ? { fields: { note: "Form blur: bad note" } } : undefined),
       onBlurAsyncDebounceMs: 200,
-      onBlurAsync: async ({ value }) =>
-        value.note === "taken" ? { fields: { note: "Form async blur: taken" } } : undefined,
+      onBlurAsync: async ({ value }) => {
+        formCheckedAt.set(Date.now());
+        return value.note === "taken" ? { fields: { note: "Form async blur: taken" } } : undefined;
+      },
       onChangeAsyncDebounceMs: 300,
       onChangeAsync: async () => {
         runs.update((n) => n + 1);
@@ -1235,6 +1240,7 @@ function RulesScreen() {
         )}
       </form.Field>
       <Text testID="form-runs">{`form runs ${runs()}`}</Text>
+      <Text testID="form-blur-timing">{`form blur gap ${formCheckedAt() - formBlurredAt()}`}</Text>
       <Blur />
     </View>
   );
@@ -1247,14 +1253,19 @@ function RulesScreen() {
 function DynamicScreen() {
   const blurredAt = signal(0);
   const checkedAt = signal(0);
+  const formBlurredAt = signal(0);
+  const formCheckedAt = signal(0);
   const form = createForm(() => ({
     defaultValues: { code: "", note: "", slug: "" },
     validationLogic: revalidateLogic({ mode: "blur" }),
+    listeners: { onBlur: () => formBlurredAt.set(Date.now()) },
     validators: {
       onDynamic: ({ value }) => (value.code === "dyn" ? { fields: { code: "Form dynamic code" } } : undefined),
       onDynamicAsyncDebounceMs: 150,
-      onDynamicAsync: async ({ value }) =>
-        value.note === "dyn" ? { fields: { note: "Form dynamic async" } } : undefined,
+      onDynamicAsync: async ({ value }) => {
+        formCheckedAt.set(Date.now());
+        return value.note === "dyn" ? { fields: { note: "Form dynamic async" } } : undefined;
+      },
     },
   }));
   return (
@@ -1295,6 +1306,7 @@ function DynamicScreen() {
         )}
       </form.Field>
       <Text testID="slug-timing">{`dynamic gap ${checkedAt() - blurredAt()}`}</Text>
+      <Text testID="form-dynamic-timing">{`form-level async gap ${formCheckedAt() - formBlurredAt()}`}</Text>
       <Blur />
     </View>
   );

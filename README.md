@@ -15,7 +15,7 @@ TSX runs on NSH's prebuilt runtime in QuickJS, and TanStack's JavaScript core ru
 
 A Rust app cannot run that core, so the crate ports its behavior. It builds on [`gpui-form`](https://github.com/freeoxide/gpui-form)'s GPUI-free core, published as `freeoxide-gpui-form-core`: `FormState` for values and baseline, and `FieldPath` for names. The rest of `gpui-form` could not be reused, because `#[derive(GpuiForm)]` generates GPUI entities and widgets.
 
-Requires NSH 0.4.0.
+Requires NSH 0.5.0.
 
 ## TypeScript
 
