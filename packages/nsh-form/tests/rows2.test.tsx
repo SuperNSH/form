@@ -14,14 +14,16 @@ test("r2. form-level onBlur runs when a field loses focus", async () => {
   expect(text(app)).toContain("error Form blur: bad note");
 });
 
+// The gap is measured from the blur itself: a step may move the manual clock
+// by a display frame while native animations finish (NSH 0.5.0).
 test("r3. form-level onBlurAsync waits its onBlurAsyncDebounceMs after the blur", async () => {
   const app = await start("rules");
   await app.type("id:note", "taken");
   await app.press("role:button[Blur]");
-  await app.clock!.runFor(199);
-  expect(text(app)).not.toContain("Form async blur: taken");
-  await app.clock!.runFor(1);
+  await app.clock!.runFor(1000);
   expect(text(app)).toContain("error Form async blur: taken");
+  const gap = Number(text(app).match(/form blur gap (-?\d+)/)?.[1]);
+  expect(gap).toBe(200);
 });
 
 test("r4. form-level onDynamic runs when revalidateLogic adds it on blur, not on change", async () => {
@@ -36,10 +38,10 @@ test("r5. form-level onDynamicAsync waits its onDynamicAsyncDebounceMs", async (
   const app = await start("dynamic");
   await app.type("id:note", "dyn");
   await app.press("role:button[Blur]");
-  await app.clock!.runFor(149);
-  expect(text(app)).not.toContain("Form dynamic async");
-  await app.clock!.runFor(1);
+  await app.clock!.runFor(1000);
   expect(text(app)).toContain("error Form dynamic async");
+  const gap = Number(text(app).match(/form-level async gap (-?\d+)/)?.[1]);
+  expect(gap).toBe(150);
 });
 
 test("r6. form-level onChangeAsync waits its onChangeAsyncDebounceMs", async () => {
