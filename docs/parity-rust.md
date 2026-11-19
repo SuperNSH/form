@@ -265,7 +265,7 @@ are written here from first principles.
 | date_picker | `bind_date_picker` | done | `bind_date_picker_two_picks_set_the_range` | Range mode tested. The single-date mode is not tested. |
 | calendar | `bind_calendar` | done | `bind_calendar_a_press_on_a_day_sets_the_date` | Value is a `Date`. |
 | time_field | `bind_time_field` | done | `bind_time_field_typed_digits_set_the_time` | Typed digits "0930" give 09:30. |
-| color_field | — | not applicable | — | NSH 0.4.0 `ColorFieldProps` holds no value. It reads and writes the enclosing ColorPicker's colour, and its only events are `NoEvent`. Bind the color_picker instead. |
+| color_field | — | not applicable | — | NSH 0.6.0 `ColorFieldProps` holds no value (`nsh-base/src/color_picker/mod.rs`). It reads and writes the enclosing ColorPicker's colour, and its only events are `NoEvent`. Bind the color_picker instead. |
 | color_picker | `bind_color_picker` | done | `bind_color_picker_a_hue_drag_changes_the_colour` | Hue slider drag works. A drag on the colour area does not change the colour, as in the TypeScript test. Not bound. |
 | editor (rich) | `bind_rich_editor` | done | `bind_rich_editor_typing_stores_the_document` | Reads the document through the component ref (`RichEditorApi::doc_json`) with a revision guard. |
 

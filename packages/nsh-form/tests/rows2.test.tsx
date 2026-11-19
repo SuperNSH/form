@@ -15,7 +15,7 @@ test("r2. form-level onBlur runs when a field loses focus", async () => {
 });
 
 // The gap is measured from the blur itself: a step may move the manual clock
-// by a display frame while native animations finish (NSH 0.5.0).
+// by a display frame while native animations finish (NSH 0.6.0, "Controlling time" in its testing docs).
 test("r3. form-level onBlurAsync waits its onBlurAsyncDebounceMs after the blur", async () => {
   const app = await start("rules");
   await app.type("id:note", "taken");

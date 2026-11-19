@@ -138,7 +138,7 @@ Both versions follow NSH's rule that only the bindings that read a changed value
 
 - A row of an array field is keyed by index, because a field's name is fixed when its options are read.
 - `field()` is a view of the `FieldApi`, so `getInfo().instance` is not the same object as `field()`. Both share one `store`.
-- NSH 0.4.0 limits two controls: `ColorField` holds no value, and focusing a `NumberInput` focuses its wrapper, so typed digits don't reach it.
+- NSH 0.6.0 limits two controls: `ColorField` holds no value, and focusing a `NumberInput` focuses its wrapper, so typed digits don't reach it. Checked against the 0.6.0 sources (`nsh-base`'s `color_picker/mod.rs`, `number_input.rs`) and by test 23e-2.
 - `restoreForm` makes the saved values the new defaults, so a restored draft doesn't read as changed.
 
 **Rust:** these are deliberate:
