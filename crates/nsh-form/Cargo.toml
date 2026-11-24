@@ -1,6 +1,8 @@
 [package]
 name = "nsh-form"
 description = "Typed forms for Native Shell Rust apps, on the GPUI-free state helpers of gpui-form"
+readme = "../../README.md"
+keywords = ["nsh", "forms", "validation", "state"]
 version.workspace = true
 edition.workspace = true
 license.workspace = true

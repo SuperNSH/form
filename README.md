@@ -9,6 +9,16 @@ There are two versions:
 | TypeScript package | `packages/nsh-form` | `@tanstack/form-core` 1.33.5, unchanged, with a thin NSH adapter | TSX apps, signed packages, anything with no Rust crate |
 | Rust crate | `crates/nsh-form` | A hand-written port of TanStack Form's behavior, in snake_case | Rust and Rust-with-TSX apps |
 
+## Install
+
+For Rust apps:
+
+```sh
+cargo add nsh-form
+```
+
+The TypeScript package is not on npm. Link it as shown under [TypeScript](#typescript).
+
 ## Why two versions
 
 TSX runs on NSH's prebuilt runtime in QuickJS, and TanStack's JavaScript core runs there unmodified. The TypeScript package adds only what NSH needs: signals, components, and bindings for `nsh/base` controls.
@@ -71,7 +81,7 @@ mount(SignIn);
 
 ```toml
 [dependencies]
-nsh-form = { path = "../nsh-form/crates/nsh-form" }
+nsh-form = "0.1"
 ```
 
 ```rust
