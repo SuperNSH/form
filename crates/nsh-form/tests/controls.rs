@@ -12,7 +12,7 @@ use nsh_base::{SliderValue, TimeOfDay};
 use nsh_core::prelude::*;
 use nsh_engine::{Clock, EngineConfig, Root};
 use nsh_form::{field, use_form};
-use nsh_testing::Headless;
+use nsh_testing::{DragOptions, Headless};
 
 fn start(root: Root) -> Headless {
     let mut config = EngineConfig::new(root);
@@ -156,8 +156,12 @@ pub fn SliderApp() -> impl IntoElement {
 fn bind_slider_a_drag_changes_the_value() {
     let mut app = start(Root::of::<SliderApp>());
     app.wait_for("text:volume Some(Single(40.0))").unwrap();
-    app.drag("label:Volume", nsh_core::Point::new(px(60.0), px(0.0)))
-        .unwrap();
+    app.drag(
+        "label:Volume",
+        nsh_core::Point::new(px(60.0), px(0.0)),
+        DragOptions::default(),
+    )
+    .unwrap();
     app.wait_for_gone("text:volume Some(Single(40.0))", Duration::from_secs(5))
         .unwrap();
 }
@@ -249,8 +253,12 @@ pub fn ColorApp() -> impl IntoElement {
 fn bind_color_picker_a_hue_drag_changes_the_colour() {
     let mut app = start(Root::of::<ColorApp>());
     app.wait_for("text:swatch None").unwrap();
-    app.drag("label:Hue", nsh_core::Point::new(px(60.0), px(0.0)))
-        .unwrap();
+    app.drag(
+        "label:Hue",
+        nsh_core::Point::new(px(60.0), px(0.0)),
+        DragOptions::default(),
+    )
+    .unwrap();
     app.wait_for_gone("text:swatch None", Duration::from_secs(5))
         .unwrap();
 }

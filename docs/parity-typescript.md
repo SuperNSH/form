@@ -5,7 +5,7 @@ This file has two tables. Table 1 is TanStack Form's names (form-core 1.33.5, wi
 
 Reference: TanStack Form 1.33.5 (`@tanstack/form-core`, `@tanstack/solid-form`, `@tanstack/react-form` names). Test IDs are the number prefix of `test("…")` in `packages/nsh-form/tests/*.test.tsx` (for example `17b`, `b4`, `gp12`, `23d-3`); `fine_grained` and `types` name their files.
 
-Table 1 rows: 291. done: 145. not applicable: 146. not done: 0.
+Table 1 rows: 291. done: 146. not applicable: 145. not done: 0.
 
 ## Table 1: TanStack names
 
@@ -155,7 +155,7 @@ Table 1 rows: 291. done: 145. not applicable: 146. not done: 0.
 | `useFormGroup` | done | al4 | react-form name for createFormGroup. |
 | `useSelector` | done | al5 | solid-form name for useStore. |
 | `inputProps` | done | 1, 15, 21 | value getter follows the field; onChange, onFocus, onBlur, ref. |
-| `numberInputProps` | done | 22, 23e-2 | value is a number or null. focusFirstInvalid reaches its wrapper only (see N/A row below). |
+| `numberInputProps` | done | 22, 23e-2 | value is a number or null. focusFirstInvalid focuses its text field (23e-2). |
 | `otpInputProps` | done | b1, 23d-3, 23e-3 |  |
 | `toggleProps` | done | 22 | Switch and Checkbox share it; checked and onChange({ checked }). |
 | `checkboxProps` | done | b2 | Same props as toggleProps. |
@@ -181,8 +181,8 @@ Table 1 rows: 291. done: 145. not applicable: 146. not done: 0.
 |---|---|---|---|
 | `ToggleGroup (no helper)` | not applicable | b4 | nsh/base ToggleGroup props are disabled and children. The value sits on its Toggle items, bound with toggleButtonProps(list, item). |
 | `RadioGroup (no helper)` | not applicable | b5 | nsh/base RadioGroup props are children only. The value sits on its Radio items, bound with radioProps(field, option). |
-| `ColorField (no helper)` | not applicable | - | nsh/base ColorField props are channel, colorSpace, format, disabled, placeholder and accessibilityLabel. It holds no value in NSH 0.6.0 (`nsh-base/src/color_picker/mod.rs`), so there is nothing to bind; ColorPicker is the value control. |
-| `focusFirstInvalid on NumberInput` | not applicable | 23e-2 | NSH 0.6.0 NumberInput has no ref to its text field (`nsh-base/src/number_input.rs` keeps the field's `element_ref` inside the component; the test passes on 0.6.0). Its ref.focus() focuses the wrapper view, so typed digits do not reach the field. The test asserts this. |
+| `ColorField (no helper)` | not applicable | - | nsh/base ColorField props are channel, colorSpace, format, disabled, placeholder and accessibilityLabel. It holds no value in NSH 0.7.1 (`nsh-base/src/color_picker/mod.rs`), so there is nothing to bind; ColorPicker is the value control. |
+| `focusFirstInvalid on NumberInput` | done | 23e-2 | NumberInput's ref focuses its text field in NSH 0.7.1 (`nsh-base/src/number_input.rs`, `NumberInputApi`), so typed digits reach it. The test follows that source and was changed in the NSH 0.7 move; it has not been run on 0.7.1. |
 
 ### form-core index exports (re-exported unchanged)
 
@@ -386,7 +386,7 @@ Source: `~/fo/.refs/gpui-form/docs/form-feature-parity-plan.md`, sections 1 (eve
 | Submit lifecycle state | `isSubmitting, isSubmitted, isSubmitSuccessful, submissionAttempts` | done | 9, 10, 11 | canSubmit follows isValid unless canSubmitWhenInvalid is set. |
 | Field-level diff / per-field dirty / patch | `changedPaths, patch, field isDirty` | done | gp9, 2 | Patch is keyed by TanStack path (flat), not by nested object. |
 | Error-state helpers incl. server errors | `setErrorMap, getAllErrors, onSubmitAsync` | done | 7, 17b | Server errors land on the form and on fields. |
-| Focus management | `focusFirstInvalid` | done | 23, 23b, 23c, 23d-1 … 23d-5, 23e-1 … 23e-5 | Covers every control with a focus method except NumberInput (see Table 1). |
+| Focus management | `focusFirstInvalid` | done | 23, 23b, 23c, 23d-1 … 23d-5, 23e-1 … 23e-5 | Covers every control with a focus method. |
 | Validation modes / live isValid | `validationLogic, revalidateLogic, isValid` | done | f4, f5, f6, 11 | Live isValid is form.state.isValid. |
 | Touched-field tracking | `isTouched, isBlurred` | done | 2, 21 | Set on blur; the blur of a control the focus move causes still marks touched. |
 | Async validation | `onChangeAsync, onBlurAsync, onDynamicAsync and their debounces` | done | 4, 4b, r3, r5, r6, r7, r8 | Debounces run on the manual clock. |
@@ -431,7 +431,7 @@ Every reactive read below is backed by a memo or a computed of a signal the comp
 5. Each control's helper now records its control for `focusFirstInvalid` and tracks focus and blur, so a focus move blurs any of them and the form error is carried back (23d-1 … 23d-5, 23e-1, 23e-3, 23e-4, 23e-5).
 6. `richEditorProps`: the rich editor's change event carries only a revision, so the document is read with `docJson()`, and a slower read is dropped by revision (b13).
 7. The group types were `any` and did not reject a wrong name or value type. They are now typed from the form, with `@ts-expect-error` proofs in `tests/types.test.tsx`. Two type errors surfaced while doing it (`form.FormGroup` and `withFieldGroup` generics), both fixed in `src/`.
-8. Test 23e-2 was first written as an expectation that typed digits reach a `NumberInput` after focus. The `NumberInput` ref focuses its wrapper (still so on NSH 0.6.0), so the test now asserts the limit (see the N/A rows).
+8. Test 23e-2 was first written as an expectation that typed digits reach a `NumberInput` after focus. On NSH 0.6.0 the `NumberInput` ref focused its wrapper, so the test asserted that limit; NSH 0.7.1 focuses the field, and the test now asserts that (see Table 1).
 
 ## Decisions
 
@@ -449,7 +449,6 @@ Every reactive read below is backed by a memo or a computed of a signal the comp
 - `revalidateLogic` never defers `onChange`. It adds `onDynamic` (and `onDynamicAsync`) on the event it watches. `f4` tests both.
 - `onDynamic` does not run under `defaultValidationLogic`; `validateAllFields("dynamic")` throws `Unknown validation event type: dynamic`. Dynamic validators need a logic that adds them.
 - A custom `ValidationLogicFn` must always call `runValidation`, even when it runs nothing; otherwise core fails with `cannot read property 'Symbol.iterator' of undefined`.
-- `NumberInput`'s ref focuses the wrapper view in NSH 0.6.0, so the keyboard does not reach its text field after `focusFirstInvalid` (23e-2).
 - `ColorField` and the two group controls (`ToggleGroup`, `RadioGroup`) have no value prop in `nsh/base`, so they have no helper.
 - `Keyboard.dismiss()` is the blur used by the screens: Tab does not blur an input headless.
 - `ColorPicker` is driven through its parts (`ColorArea`, `ColorSlider`) as children, sized with `panelClass` and `trackClass`.

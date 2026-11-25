@@ -14,11 +14,11 @@ test("23e-1. focusFirstInvalid focuses an Input, and typing goes into it", async
   expect(app.value("id:fe-input")).toBe("x");
 });
 
-test("23e-2. focusFirstInvalid calls NumberInput's ref focus; in NSH 0.6.0 that focus is the wrapper view, so typed digits do not reach the field", async () => {
+test("23e-2. focusFirstInvalid calls NumberInput's ref focus, and typed digits go into the field", async () => {
   const app = await openOnly("amount");
   await app.press("role:button[Save]");
   await app.keyboard.press("7");
-  expect(app.value("id:fe-number")).toBe("");
+  expect(app.value("id:fe-number")).toBe("7");
 });
 
 test("23e-3. focusFirstInvalid focuses an OtpInput, and typing goes into it", async () => {

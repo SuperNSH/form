@@ -25,7 +25,7 @@ TSX runs on NSH's prebuilt runtime in QuickJS, and TanStack's JavaScript core ru
 
 A Rust app cannot run that core, so the crate ports its behavior. It builds on [`gpui-form`](https://github.com/freeoxide/gpui-form)'s GPUI-free core, published as `freeoxide-gpui-form-core`: `FormState` for values and baseline, and `FieldPath` for names. The rest of `gpui-form` could not be reused, because `#[derive(GpuiForm)]` generates GPUI entities and widgets.
 
-Requires NSH 0.6.0.
+Requires NSH 0.7.1.
 
 ## TypeScript
 
@@ -148,7 +148,7 @@ Both versions follow NSH's rule that only the bindings that read a changed value
 
 - A row of an array field is keyed by index, because a field's name is fixed when its options are read.
 - `field()` is a view of the `FieldApi`, so `getInfo().instance` is not the same object as `field()`. Both share one `store`.
-- NSH 0.6.0 limits two controls: `ColorField` holds no value, and focusing a `NumberInput` focuses its wrapper, so typed digits don't reach it. Checked against the 0.6.0 sources (`nsh-base`'s `color_picker/mod.rs`, `number_input.rs`) and by test 23e-2.
+- NSH 0.7.1 limits one control: `ColorField` holds no value, so bind the `ColorPicker` instead. Checked against the 0.7.1 source (`nsh-base`'s `color_picker/mod.rs`).
 - `restoreForm` makes the saved values the new defaults, so a restored draft doesn't read as changed.
 
 **Rust:** these are deliberate:
